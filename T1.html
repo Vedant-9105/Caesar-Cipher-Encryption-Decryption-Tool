@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher Tool</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        textarea, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .shift-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+        }
+        
+        input[type="number"] {
+            width: 70px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #encrypt-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        #encrypt-btn:hover {
+            background-color: #27ae60;
+        }
+        
+        #decrypt-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        #decrypt-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        #clear-btn {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        #clear-btn:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .result {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .result h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        #result-text {
+            min-height: 100px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        
+        .history {
+            margin-top: 30px;
+        }
+        
+        .history-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid #9b59b6;
+        }
+        
+        .history-item p {
+            margin: 5px 0;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .shift-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            input[type="number"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Caesar Cipher Tool</h1>
+        <p class="description">Encrypt or decrypt messages using the Caesar Cipher algorithm. Enter your text and shift value, then click encrypt or decrypt.</p>
+        
+        <div class="input-group">
+            <label for="message">Your Message:</label>
+            <textarea id="message" placeholder="Enter text to encrypt or decrypt..."></textarea>
+        </div>
+        
+        <div class="input-group">
+            <label for="shift">Shift Value:</label>
+            <div class="shift-container">
+                <input type="range" id="shift-range" min="1" max="25" value="3">
+                <input type="number" id="shift-number" min="1" max="25" value="3">
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button id="encrypt-btn">Encrypt</button>
+            <button id="decrypt-btn">Decrypt</button>
+            <button id="clear-btn">Clear</button>
+        </div>
+        
+        <div class="result">
+            <h3>Result:</h3>
+            <div id="result-text"></div>
+        </div>
+        
+        <div class="history">
+            <h3>History:</h3>
+            <div id="history-container"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Caesar Cipher Tool &copy; 2023 | All characters except letters will remain unchanged</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.getElementById('message');
+            const shiftRange = document.getElementById('shift-range');
+            const shiftNumber = document.getElementById('shift-number');
+            const encryptBtn = document.getElementById('encrypt-btn');
+            const decryptBtn = document.getElementById('decrypt-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultText = document.getElementById('result-text');
+            const historyContainer = document.getElementById('history-container');
+            
+            // Sync range and number inputs
+            shiftRange.addEventListener('input', () => {
+                shiftNumber.value = shiftRange.value;
+            });
+            
+            shiftNumber.addEventListener('input', () => {
+                if (shiftNumber.value > 25) shiftNumber.value = 25;
+                if (shiftNumber.value < 1) shiftNumber.value = 1;
+                shiftRange.value = shiftNumber.value;
+            });
+            
+            // Caesar Cipher function
+            function caesarCipher(text, shift, encrypt = true) {
+                return text.split('').map(char => {
+                    if (char.match(/[a-z]/i)) {
+                        const base = char === char.toUpperCase() ? 'A'.charCodeAt(0) : 'a'.charCodeAt(0);
+                        const offset = encrypt ? shift : (26 - shift) % 26;
+                        return String.fromCharCode(
+                            ((char.charCodeAt(0) - base + offset) % 26) + base
+                        );
+                    }
+                    return char;
+                }).join('');
+            }
+            
+            // Add to history
+            function addToHistory(original, result, shift, encrypt) {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <p><strong>${encrypt ? 'Encrypted' : 'Decrypted'}</strong> with shift ${shift}</p>
+                    <p><strong>Original:</strong> ${original}</p>
+                    <p><strong>Result:</strong> ${result}</p>
+                `;
+                historyContainer.prepend(historyItem);
+            }
+            
+            // Encrypt button click
+            encryptBtn.addEventListener('click', () => {
+                const message = messageInput.value;
+                const shift = parseInt(shiftNumber.value);
+                
+                if (message) {
+                    const encrypted = caesarCipher(message, shift, true);
+                    resultText.textContent = encrypted;
+                    addToHistory(message, encrypted, shift, true);
+                } else {
+                    resultText.textContent = 'Please enter a message to encrypt';
+                }
+            });
+            
+            // Decrypt button click
+            decryptBtn.addEventListener('click', () => {
+                const message = messageInput.value;
+                const shift = parseInt(shiftNumber.value);
+                
+                if (message) {
+                    const decrypted = caesarCipher(message, shift, false);
+                    resultText.textContent = decrypted;
+                    addToHistory(message, decrypted, shift, false);
+                } else {
+                    resultText.textContent = 'Please enter a message to decrypt';
+                }
+            });
+            
+            // Clear button click
+            clearBtn.addEventListener('click', () => {
+                messageInput.value = '';
+                resultText.textContent = '';
+                shiftRange.value = 3;
+                shiftNumber.value = 3;
+            });
+        });
+    </script>
+</body>
+</html>
